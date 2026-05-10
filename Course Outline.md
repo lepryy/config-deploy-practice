@@ -221,8 +221,13 @@ on:
       - main      # Push to main = deploy to prod
       - staging   # Push to staging = deploy to staging
     paths:
-      - 'config/**'  # ONLY trigger if files in config/ changed
+      - 'config/**'              # trigger on config changes
+      - '.github/workflows/**'   # also trigger when the workflow file itself changes
   workflow_dispatch:  # This adds a "Run workflow" button in the UI
+                      # ⚠️ Note: the button only appears once this workflow exists
+                      # on the repo's DEFAULT branch (usually `main`). If you've
+                      # only pushed to `staging` so far, you won't see the button
+                      # until after you merge to `main` (Test 3 below).
     inputs:
       target:
         description: 'Which environment to deploy?'
@@ -304,24 +309,38 @@ git commit -m "add deploy workflow with branch logic"
 git push
 ```
 
-### Step 4: Test Both Triggers
+### Step 4: Test All Three Triggers
+
+**Important ordering note:** the manual "Run workflow" button (`workflow_dispatch`)
+only appears in the GitHub UI once the workflow file exists on the repo's
+**default branch** (`main`). Because we've only committed it on `staging` so far,
+we'll do the manual-trigger test LAST — after merging to `main` makes the
+button available.
 
 **Test 1 — Staging auto-deploy:**
-You just pushed to `staging`, so a workflow should already be running. Check the Actions tab.
+You just pushed to `staging`, so a workflow should already be running. Check the
+Actions tab.
 
-**Test 2 — Manual trigger:**
-1. Go to Actions tab → "Deploy Config Files" workflow
-2. Click **Run workflow**
-3. Choose `prod` from the dropdown
-4. Watch it run and notice it says "prod" in the output
+> Gotcha: the `paths:` filter means the workflow only fires if files matching
+> those globs changed in this push. If you ever push a commit that *only* edits
+> something outside those paths (e.g. just the README), GitHub will skip the
+> run — that's not a bug, that's the filter working.
 
-**Test 3 — Prod deploy on merge:**
+**Test 2 — Prod deploy on merge:**
 ```bash
 git checkout main
 git merge staging
 git push
 ```
-Watch the workflow trigger on `main` and deploy to prod.
+Watch the workflow trigger on `main` and deploy to prod. As a side effect, the
+workflow file now lives on `main`, which unlocks the manual-dispatch button for
+the next test.
+
+**Test 3 — Manual trigger:**
+1. Go to Actions tab → "Deploy Config Files" workflow
+2. Click **Run workflow** (this button only appears now that the workflow is on `main`)
+3. Choose `prod` from the dropdown
+4. Watch it run and notice it says "prod" in the output
 
 > ✅ **Phase 2 complete.** You understand branch triggers, conditions, job outputs, `uses:` (pre-built actions), and manual dispatch.
 

@@ -10,6 +10,7 @@ on:
     paths:    # Only trigger if files in these paths change
       - 'production/**'
       - 'staging/**'
+      - '.github/workflows/**'
   workflow_dispatch:  # This adds a "Run workflow" button in the UI
     inputs:
       target:
@@ -39,9 +40,9 @@ jobs:
           if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
             echo "environment=${{ inputs.target }}" >> $GITHUB_OUTPUT
 
-          # If pushed to main branch, deploy to prod
+          # If pushed to main branch, deploy to production
           elif [ "${{ github.ref_name }}" == "main" ]; then
-            echo "environment=prod" >> $GITHUB_OUTPUT
+            echo "environment=production" >> $GITHUB_OUTPUT
 
           # If pushed to staging branch, deploy to staging
           elif [ "${{ github.ref_name }}" == "staging" ]; then
@@ -69,10 +70,11 @@ jobs:
       - name: Show the config file we would deploy
         run: |
           TARGET="${{ needs.determine-environment.outputs.environment }}"
+          CONFIG_PATH="$TARGET/inserver6/etc/inserver6.ini"
           echo "=== Deploying configs for: $TARGET ==="
           echo ""
-          echo "--- Contents of config/$TARGET/app.conf ---"
-          cat config/$TARGET/app.conf
+          echo "--- Contents of $CONFIG_PATH ---"
+          cat "$CONFIG_PATH"
 
       # This is where real SSH deployment would go (Phase 4)
       # For now, we just simulate it
