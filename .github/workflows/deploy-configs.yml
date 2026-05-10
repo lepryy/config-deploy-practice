@@ -65,7 +65,7 @@ jobs:
       # This built-in action checks out YOUR repo onto the runner
       # Without this step, the runner has no idea your files exist
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Show the config file we would deploy
         run: |
