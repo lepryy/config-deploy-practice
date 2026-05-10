@@ -1,0 +1,28 @@
+# The name that shows up in the GitHub Actions tab
+name: Hello World
+
+# TRIGGER: When does this workflow run?
+on:
+  push:                    # Run when code is pushed...
+    branches:
+      - main               # ...but only to the main branch
+
+# JOBS: What do we actually do?
+jobs:
+
+  say-hello:               # This is the job ID (you name it)
+    runs-on: ubuntu-latest # Use GitHub's free Ubuntu runner
+
+    steps:                 # Steps run top-to-bottom, in order
+
+      - name: Print a greeting
+        run: echo "Hello from GitHub Actions!"
+
+      - name: Show the current date and time
+        run: date
+
+      - name: Show what directory we're in
+        run: pwd
+
+      - name: List files (the runner starts empty!)
+        run: ls -la
