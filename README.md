@@ -1,2 +1,1 @@
-# githubactionscourse
-A place for me to learn GitHub Actions
+# A place for me to learn GitHub Actions
